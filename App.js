@@ -7,23 +7,47 @@
  */
 
 import React, {Component} from 'react';
-import {Platform, StyleSheet, Text, View} from 'react-native';
-
-const instructions = Platform.select({
-  ios: 'Press Cmd+R to reload,\n' + 'Cmd+D or shake for dev menu',
-  android:
-    'Double tap R on your keyboard to reload,\n' +
-    'Shake or press menu button for dev menu',
-});
+import {Platform, StyleSheet, Text, View, TouchableOpacity} from 'react-native';
+import AppleHealthKit from 'rn-apple-healthkit';
 
 type Props = {};
 export default class App extends Component<Props> {
+  onPress = () => {
+    const options = {
+      permissions: {
+        read: ['StepCount', 'Steps'],
+      },
+    };
+
+    AppleHealthKit.initHealthKit(options, (error, result) => {
+      if (error) {
+        console.log('error', error);
+      }
+
+      if (result) {
+        console.log('result', result);
+
+        const d = new Date(2016,1,1);
+
+        AppleHealthKit.getStepCount({ date: d.toISOString() }, (error2, result2) => {
+          if (error2) {
+            console.log('error2', error2);
+          }
+
+          if (result2) {
+            console.log('result2', result2);
+          }
+        })
+      }
+    });
+  }
+
   render() {
     return (
       <View style={styles.container}>
-        <Text style={styles.welcome}>Welcome to React Native!</Text>
-        <Text style={styles.instructions}>To get started, edit App.js</Text>
-        <Text style={styles.instructions}>{instructions}</Text>
+        <TouchableOpacity onPress={this.onPress}>
+          <Text style={styles.welcome}>Tap to connect Apple HealthKit</Text>
+        </TouchableOpacity>
       </View>
     );
   }
